@@ -8,6 +8,7 @@ typedef struct _node    node_t;
 typedef node_t*         mark_ptr_t;     // pointer to next node, with marked info
 typedef unsigned int    key_t;
 typedef unsigned int    value_t;
+typedef struct _table   hashtable_t;
 
 struct _node {
     key_t       key;
@@ -25,7 +26,7 @@ struct _table {
 
 #define LOAD_FACTOR 0.75
 
-typedef struct _table table_t;
+
 
 //reverse the bits of a 32-bit unsigned int
 unsigned reverse32bits(unsigned x) {
@@ -69,25 +70,25 @@ key_t so_dummykey(key_t key){
 
 mark_ptr_t get_count (mark_ptr_t a)
 {
-    mark_ptr_t b = (unsigned long long)a >> 63;
-    return b;
+    unsigned long long b = (unsigned long long)a >> 63;
+    return (mark_ptr_t)b;
 }
 
 
 mark_ptr_t get_pointer (mark_ptr_t a)
 {
-    mark_ptr_t b = (unsigned long long)a << 1;
+    unsigned long long b = (unsigned long long)a << 1;
     b = (unsigned long long)b >> 1;
-    return b;
+    return (mark_ptr_t)b;
 }
 
 
 mark_ptr_t set_count (mark_ptr_t a, mark_ptr_t count)
 {
     unsigned long long count_temp = (unsigned long long)count << 63;
-    mark_ptr_t b = get_pointer(a);
+    unsigned long long b = (unsigned long long)get_pointer(a);
     b = (unsigned long long)b | count_temp;
-    return b;
+    return (mark_ptr_t)b;
 }
 
 mark_ptr_t set_pointer(mark_ptr_t a, mark_ptr_t ptr){
@@ -95,7 +96,7 @@ mark_ptr_t set_pointer(mark_ptr_t a, mark_ptr_t ptr){
     mark_ptr_t c = get_count(a);
     b = set_count(b,c);
     ptr = get_pointer(ptr);
-    b= (unsigned long long)b | (unsigned long long)ptr;
+    b = (mark_ptr_t)((unsigned long long)b | (unsigned long long)ptr);
     return b;
 }
 
@@ -179,7 +180,7 @@ int list_delete(mark_ptr_t *head ,key_t key){
     while (1){
         if (!list_find(&head,key))  return 0;
         mark_ptr_t compare_value = set_both(compare_value,get_pointer(next),0);
-        mark_ptr_t new_value = set_both(new_value,get_pointer(next),1);
+        mark_ptr_t new_value = set_both(new_value,get_pointer(next),(mark_ptr_t)1);
 
         if(!__sync_bool_compare_and_swap(&(((node_t *)get_pointer(curr))->marked_next),compare_value,new_value)) 
             continue;
@@ -205,7 +206,7 @@ int get_parent(int bucket){
      return result;
 }    
 
-void initialize_bucket(table_t *ht, int bucket)
+void initialize_bucket(hashtable_t *ht, int bucket)
 {
     int parent = get_parent(bucket);
     // printf("parent:%d, bucket:%d\n", parent, bucket);
@@ -222,7 +223,7 @@ void initialize_bucket(table_t *ht, int bucket)
     ht->table[bucket] = (mark_ptr_t) dummy;
 }
 
-int table_find(table_t *ht, key_t key)
+int table_find(hashtable_t *ht, key_t key)
 {
     int bucket = key % ht->size;
     if (ht->table[bucket] == NULL)
@@ -232,7 +233,7 @@ int table_find(table_t *ht, key_t key)
     return list_find(&temp, so_regularkey(key));
 }
 
-int table_insert(table_t *ht, key_t key, value_t value)
+int table_insert(hashtable_t *ht, key_t key, value_t value)
 {
     node_t *node = (node_t *) malloc (sizeof(node_t));
     node->key = so_regularkey(key);
@@ -265,7 +266,7 @@ int table_insert(table_t *ht, key_t key, value_t value)
     return 1;
 }
 
-int table_delete(table_t *ht, key_t key)
+int table_delete(hashtable_t *ht, key_t key)
 {
     int bucket = key % ht->size;
     if (ht->table[bucket] == NULL)
@@ -278,9 +279,9 @@ int table_delete(table_t *ht, key_t key)
     return 1;
 }
 
-table_t* table_create()
+hashtable_t* table_create()
 {
-    table_t* ht = (table_t*) malloc (sizeof(table_t));
+    hashtable_t* ht = (hashtable_t*) malloc (sizeof(hashtable_t));
     ht->size = 16;
     ht->count = 0;
     ht->table = calloc (sizeof(node_t*), 16);
@@ -290,7 +291,7 @@ table_t* table_create()
 }
 
 
-void table_free(table_t *ht) {
+void table_free(hashtable_t *ht) {
     if (ht == NULL) return;
 
 
@@ -345,13 +346,14 @@ void print_list(mark_ptr_t * head){
     }
 }
 
-table_t* HT;
+hashtable_t* HT;
 
 #define INSERT_CNT 1000000
 void*
-async_insert (int arg)
+async_insert (void* args)
 {
-    int base = INSERT_CNT * arg; // 0 100 200 300
+    int* arg = (int*) args;
+    int base = INSERT_CNT * (*arg); // 0 100 200 300
     int i;
     for (i = 0 ; i < INSERT_CNT; i++) {
         table_insert(HT, (key_t)(base + i), (value_t)(1));
@@ -361,6 +363,7 @@ async_insert (int arg)
 		// conc_hashtable_insert (_ht, UINT_TO_PTR (base + i - INSERT_CNT), UINT_TO_PTR (2));
     }
     return NULL;
+    
 }
 
 
@@ -412,15 +415,15 @@ int main()
     int i;
     
     for(i=0; i<4; i++) 
-        pthread_create(&threads[i], NULL, async_insert, (void *) i);
+        pthread_create(&threads[i], NULL, async_insert, &i);
     for(i=0; i<4; ++i)
-		    pthread_join (threads [i], NULL);
+		pthread_join (threads [i], NULL);
 
     printf("Elements Count : %d\n", HT->count);
     table_free(HT);
 
 
-    /* table_t* tbl = table_create();
+    /* hashtable_t* tbl = table_create();
     int i;
     for(i=0;i<32;i++)
         table_insert(tbl, i, i+66000);
