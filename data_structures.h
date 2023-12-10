@@ -7,6 +7,7 @@ typedef struct _node    node_t;
 typedef node_t*         mark_ptr_t;     // pointer to next node, with marked info
 typedef unsigned int    key_t;
 typedef unsigned int    value_t;
+typedef struct _table   hashtable_t;
 
 /**
  * Struct representing a node in the lock-free list.
