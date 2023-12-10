@@ -1,8 +1,8 @@
 CC = gcc
 CFLAGS = -Wall -pthread -g
-TARGET = main
-DEPS = data_structures.h so_list_hashtable.h
-OBJ = main.o so_list_hashtable.o
+TARGET = test
+DEPS = data_structures.h so_list_hashtable.h lock_based_hashtable.h
+OBJ = test.o so_list_hashtable.o lock_based_hashtable.o
 
 %.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
