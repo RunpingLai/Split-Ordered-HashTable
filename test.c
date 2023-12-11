@@ -125,7 +125,7 @@ static void *test_case_3(void *arg) {
         temp_val = key_i >> 1;
         val = (void*)&temp_val;
         status = tbl_insert(tbl, key_i, val);
-        for j = 0; j < 2; j++) {
+        for (j = 0; j < 2; j++) {
             key_f = random_search_key();
             result_val = tbl_find(tbl, key_f);
         }
