@@ -44,13 +44,13 @@ reverse32bits(unsigned x) {
 }
 
 //produce keys according to split ordering
-key_t 
-so_regularkey(key_t key){
+my_key_t 
+so_regularkey(my_key_t key){
     return reverse32bits(key|0x80000000);
 }
 
-key_t 
-so_dummykey(key_t key){
+my_key_t 
+so_dummykey(my_key_t key){
     return reverse32bits(key);
 }
 
@@ -106,7 +106,7 @@ __thread mark_ptr_t next;
 mark_ptr_t * Head = 0;
 
 int 
-list_find(mark_ptr_t ** head, key_t key)
+list_find(mark_ptr_t ** head, my_key_t key)
 {
 try_again:
     prev = (mark_ptr_t *) * head;
@@ -120,7 +120,7 @@ try_again:
         mark_ptr_t mark_bit = get_count(((mark_ptr_t)get_pointer(curr))->marked_next);
 
         next = set_both(next, pointer, mark_bit);
-        key_t ckey = ((mark_ptr_t) get_pointer(curr))->key;
+        my_key_t ckey = ((mark_ptr_t) get_pointer(curr))->key;
         mark_ptr_t check = set_both(check, curr, 0);
         if ((*prev) != check)
             goto try_again;
@@ -147,7 +147,7 @@ try_again:
 int list_insert(mark_ptr_t * head, node_t* node)
 {
     int res;
-    key_t key = node->key;
+    my_key_t key = node->key;
 
     while (1) {
         if (list_find(&head, key))
@@ -166,7 +166,7 @@ int list_insert(mark_ptr_t * head, node_t* node)
     }
 }
 
-int list_delete(mark_ptr_t *head ,key_t key){
+int list_delete(mark_ptr_t *head ,my_key_t key){
     
     while (1){
         if (!list_find(&head,key))  return 0;
@@ -214,7 +214,7 @@ void initialize_bucket(hashtable_t *ht, int bucket)
     ht->table[bucket] = (mark_ptr_t) dummy;
 }
 
-int table_find(hashtable_t *ht, key_t key)
+int table_find(hashtable_t *ht, my_key_t key)
 {
     int bucket = key % ht->size;
     if (ht->table[bucket] == NULL)
@@ -224,7 +224,7 @@ int table_find(hashtable_t *ht, key_t key)
     return list_find(&temp, so_regularkey(key));
 }
 
-int table_insert(hashtable_t *ht, key_t key, value_t value)
+int table_insert(hashtable_t *ht, my_key_t key, value_t value)
 {
     node_t *node = (node_t *) malloc (sizeof(node_t));
     node->key = so_regularkey(key);
@@ -257,7 +257,7 @@ int table_insert(hashtable_t *ht, key_t key, value_t value)
     return 1;
 }
 
-int table_delete(hashtable_t *ht, key_t key)
+int table_delete(hashtable_t *ht, my_key_t key)
 {
     int bucket = key % ht->size;
     if (ht->table[bucket] == NULL)

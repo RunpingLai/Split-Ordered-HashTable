@@ -10,7 +10,7 @@
 
 
 // Simple hash function
-unsigned int r_hash(r_lock_hashtable_t* ht, key_t key) {
+unsigned int r_hash(r_lock_hashtable_t* ht, my_key_t key) {
     return key % ht->size;
 }
 
@@ -32,7 +32,7 @@ r_lock_hashtable_t* r_lock_table_create() {
 }
 
 // Insert function
-bool r_lock_table_insert(r_lock_hashtable_t* ht, key_t key, value_t value) {
+bool r_lock_table_insert(r_lock_hashtable_t* ht, my_key_t key, value_t value) {
     unsigned int index = r_hash(ht, key);
     int res = 0;
     pthread_mutex_lock(&ht->locks[index]);
@@ -67,7 +67,7 @@ bool r_lock_table_insert(r_lock_hashtable_t* ht, key_t key, value_t value) {
 
 
 // Lookup function
-value_t r_lock_table_find(r_lock_hashtable_t* ht, key_t key) {
+value_t r_lock_table_find(r_lock_hashtable_t* ht, my_key_t key) {
     unsigned int index = r_hash(ht, key);
     pthread_mutex_lock(&ht->locks[index]);
 
@@ -101,7 +101,7 @@ void r_lock_table_free(r_lock_hashtable_t* ht) {
 }
 
 // TODO: Add value as parameter
-int r_lock_table_delete(r_lock_hashtable_t* ht, key_t key)
+int r_lock_table_delete(r_lock_hashtable_t* ht, my_key_t key)
 {
     int index = key % LOCK_TABLE_SIZE;
 

@@ -30,7 +30,7 @@ void initialize_bucket(table_t *ht, int bucket)
     ht->table[bucket] = (mark_ptr_t) dummy;
 }
 
-int table_find(table_t *ht, key_t key)
+int table_find(table_t *ht, my_key_t key)
 {
     int bucket = key % ht->size;
     if (ht->table[bucket] == NULL)
@@ -40,7 +40,7 @@ int table_find(table_t *ht, key_t key)
     return list_find(&temp, so_regularkey(key));
 }
 
-int table_insert(table_t *ht, key_t key, value_t value)
+int table_insert(table_t *ht, my_key_t key, value_t value)
 {
     node_t *node = (node_t *) malloc (sizeof(node_t));
     node->key = so_regularkey(key);
@@ -73,7 +73,7 @@ int table_insert(table_t *ht, key_t key, value_t value)
     return 1;
 }
 
-int table_delete(table_t *ht, key_t key)
+int table_delete(table_t *ht, my_key_t key)
 {
     int bucket = key % ht->size;
     if (ht->table[bucket] == NULL)

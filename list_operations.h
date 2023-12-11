@@ -41,14 +41,14 @@ unsigned reverse32bits(unsigned x) {
 }
 
 //produce keys according to split ordering
-key_t so_regularkey(key_t key){
+my_key_t so_regularkey(my_key_t key){
     return reverse32bits(key|0x80000000);
 }
 
 /*
 Produce dummy keys according to split ordering.
 */
-key_t so_dummykey(key_t key){
+my_key_t so_dummykey(my_key_t key){
     return reverse32bits(key);
 }
 
@@ -101,7 +101,7 @@ mark_ptr_t * Head = 0;
  Search for a key in the list starting from the head node.
  @return 0 if the key is not found, 1 if the key is found and not marked for deletion, or 2 if the key is found but marked for deletion.
  */
-int list_find(mark_ptr_t ** head, key_t key)
+int list_find(mark_ptr_t ** head, my_key_t key)
 {
 try_again:
     prev = (mark_ptr_t *) * head;
@@ -115,7 +115,7 @@ try_again:
         mark_ptr_t mark_bit = get_count(((mark_ptr_t)get_pointer(curr))->marked_next);
 
         next = set_both(next, pointer, mark_bit);
-        key_t ckey = ((mark_ptr_t) get_pointer(curr))->key;
+        my_key_t ckey = ((mark_ptr_t) get_pointer(curr))->key;
         mark_ptr_t check = set_both(check, curr, 0);
         if ((*prev) != check)
             goto try_again;
@@ -143,7 +143,7 @@ int list_insert(mark_ptr_t * head, node_t* node)
 {
     int res;
     int temp = 0;
-    key_t key = node->key;
+    my_key_t key = node->key;
     value_t value = node->value; // useless
 
     while (1) {
@@ -163,7 +163,7 @@ int list_insert(mark_ptr_t * head, node_t* node)
     }
 }
 
-int list_delete(mark_ptr_t *head ,key_t key){
+int list_delete(mark_ptr_t *head ,my_key_t key){
     
     while (1){
         if (!list_find(&head,key))  return 0;

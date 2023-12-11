@@ -10,9 +10,9 @@ unsigned
 reverse32bits(unsigned x);
 
 // produce keys according to split ordering
-key_t so_regularkey(key_t key);
+my_key_t so_regularkey(my_key_t key);
 
-key_t so_dummykey(key_t key);
+my_key_t so_dummykey(my_key_t key);
 
 mark_ptr_t
 get_count(mark_ptr_t a);
@@ -48,7 +48,7 @@ set_both(
 
 int list_find(
     mark_ptr_t **head, 
-    key_t key
+    my_key_t key
 );
 
 int list_insert(
@@ -58,7 +58,7 @@ int list_insert(
 
 int list_delete(
     mark_ptr_t *head, 
-    key_t key
+    my_key_t key
 );
 
 // get the parent of a bucket by just unseting the MSB
@@ -71,18 +71,18 @@ void initialize_bucket(
 
 int table_find(
     hashtable_t *ht, 
-    key_t key
+    my_key_t key
 );
 
 int table_insert(
     hashtable_t *ht, 
-    key_t key, 
+    my_key_t key, 
     value_t value
 );
 
 int table_delete(
     hashtable_t *ht, 
-    key_t key
+    my_key_t key
 );
 
 hashtable_t*

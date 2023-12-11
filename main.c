@@ -8,7 +8,7 @@ void print_list(mark_ptr_t * head){
         
     node_t * curr=(node_t *)get_pointer((mark_ptr_t)*head);
     while (curr){
-        key_t normal_key = curr->key/2;
+        my_key_t normal_key = curr->key/2;
         value_t normal_val = curr->value;
         normal_key = normal_key*2;
         
@@ -33,8 +33,8 @@ async_insert (void* args)
     int base = INSERT_CNT * (*arg); // 0 100 200 300
     int i;
     for (i = 0 ; i < INSERT_CNT; i++) {
-        table_insert(HT, (key_t)(base + i), (value_t)(1));
-        table_insert(HT, (key_t)(base + i - INSERT_CNT), (value_t)(2));
+        table_insert(HT, (my_key_t)(base + i), (value_t)(1));
+        table_insert(HT, (my_key_t)(base + i - INSERT_CNT), (value_t)(2));
     }
     return NULL;
     

@@ -7,7 +7,7 @@
 
 typedef struct _node    node_t;
 typedef node_t*         mark_ptr_t;     // pointer to next node, with marked info
-typedef unsigned int    key_t;
+typedef unsigned int    my_key_t;
 typedef unsigned int    value_t;
 typedef struct _table   hashtable_t;
 
@@ -22,7 +22,7 @@ typedef struct _table   hashtable_t;
  * Struct representing a node in the lock-free list.
  */
 struct _node {
-    key_t       key;
+    my_key_t       key;
     value_t     value;
     mark_ptr_t  marked_next;
 };
@@ -46,7 +46,7 @@ struct _table {
 
 typedef struct lock_node
 {
-    key_t key;
+    my_key_t key;
     value_t value;
     struct lock_node *next;
 } lock_node_t;
@@ -67,7 +67,7 @@ typedef struct lock_hashtable
 
 typedef struct r_lock_node
 {
-    key_t key;
+    my_key_t key;
     value_t value;
     struct r_lock_node *next;
 } r_lock_node_t;

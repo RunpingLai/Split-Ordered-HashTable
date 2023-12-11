@@ -17,19 +17,19 @@
 lock_hashtable_t *lock_table_create();
 
 // Simple hash function
-unsigned int hash(key_t key);
+unsigned int hash(my_key_t key);
 
 // Insert function
-bool lock_table_insert(lock_hashtable_t *ht, key_t key, value_t value);
+bool lock_table_insert(lock_hashtable_t *ht, my_key_t key, value_t value);
 
 
 // Lookup function
-value_t lock_table_find(lock_hashtable_t *ht, key_t key);
+value_t lock_table_find(lock_hashtable_t *ht, my_key_t key);
 
 // Function to free the hashtable
 void lock_table_free(lock_hashtable_t *ht);
 
-int lock_table_delete(lock_hashtable_t *ht, key_t key);
+int lock_table_delete(lock_hashtable_t *ht, my_key_t key);
 
 
 #endif

@@ -71,12 +71,13 @@ static void *test_case_1(void *arg) {
     // 50% inserts, 0% finds, 50% deletes
     bool status;
     int iterations = *(int*)arg;
+    int i;
     iterations /= 2;
     
-    key_t key_i, key_d, temp_val;
+    my_key_t key_i, key_d, temp_val;
     value_t val;
 
-    for (int i = 0; i < iterations; i++) {
+    for (i = 0; i < iterations; i++) {
         // printf("iteration:%d\n", i);
         key_i = random_insert_key();
         temp_val = key_i >> 1;
@@ -91,12 +92,13 @@ static void *test_case_2(void *arg) {
     // 33% inserts, 33% finds, 33% deletes
     bool status;
     int iterations = *(int*)arg;
+    int i;
     iterations /= 3;
     
-    key_t key_i, key_d, key_f, temp_val;
+    my_key_t key_i, key_d, key_f, temp_val;
     value_t val, result_val;
 
-    for (int i = 0; i < iterations; i++) {
+    for (i = 0; i < iterations; i++) {
         key_i = random_insert_key();
         temp_val = key_i >> 1;
         val = (void*)&temp_val;
@@ -112,17 +114,18 @@ static void *test_case_3(void *arg) {
     // 25% inserts, 50% finds, 25% deletes
     bool status;
     int iterations = *(int*)arg;
+    int i, j;
     iterations /= 4;
     
-    key_t key_i, key_f, key_d, temp_val;
+    my_key_t key_i, key_f, key_d, temp_val;
     value_t val, result_val;
 
-    for (int i = 0; i < iterations; i++) {
+    for (i = 0; i < iterations; i++) {
         key_i = random_insert_key();
         temp_val = key_i >> 1;
         val = (void*)&temp_val;
         status = tbl_insert(tbl, key_i, val);
-        for (int j = 0; j < 2; j++) {
+        for j = 0; j < 2; j++) {
             key_f = random_search_key();
             result_val = tbl_find(tbl, key_f);
         }
@@ -135,17 +138,18 @@ static void *test_case_4(void *arg) {
     // 15% inserts, 70% finds, 15% deletes
     bool status;
     int iterations = *(int*)arg;
+    int i, j;
     iterations /= 7;
     
-    key_t key_i, key_f, key_d, temp_val;
+    my_key_t key_i, key_f, key_d, temp_val;
     value_t val, result_val;
 
-    for (int i = 0; i < iterations; i++) {
+    for (i = 0; i < iterations; i++) {
         key_i = random_insert_key();
         temp_val = key_i >> 1;
         val = (void*)&temp_val;
         status = tbl_insert(tbl, key_i, val);
-        for (int j = 0; j < 5; j++) {
+        for (j = 0; j < 5; j++) {
             key_f = random_search_key();
             result_val = tbl_find(tbl, key_f);
         }
@@ -158,17 +162,18 @@ static void *test_case_5(void *arg) {
     // 5% inserts, 90% finds, 5% deletes
     bool status;
     int iterations = *(int*)arg;
+    int i, j;
     iterations /= 20;
     
-    key_t key_i, key_f, key_d, temp_val;
+    my_key_t key_i, key_f, key_d, temp_val;
     value_t val, result_val;
 
-    for (int i = 0; i < iterations; i++) {
+    for (i = 0; i < iterations; i++) {
         key_i = random_insert_key();
         temp_val = key_i >> 1;
         val = (void*)&temp_val;
         status = tbl_insert(tbl, key_i, val);
-        for (int j = 0; j < 18; j++) {
+        for (j = 0; j < 18; j++) {
             key_f = random_search_key();
             result_val = tbl_find(tbl, key_f);
         }
@@ -233,7 +238,8 @@ int main()
 
         printf("-------------------Test Case %d Start-------------------\n", test_case_num);
         // 1 2 4 8 16 32
-        for (int thread_num=1; thread_num<=THREADS; thread_num*=2) {
+        int thread_num;
+        for (thread_num=1; thread_num<=THREADS; thread_num*=2) {
             tbl = tbl_create();
             int each_thread_ops_count = OPS_COUNT / thread_num;
 
