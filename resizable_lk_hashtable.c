@@ -22,8 +22,8 @@ r_lock_hashtable_t* r_lock_table_create() {
     ht->table = malloc(INIT_SIZE *sizeof(r_lock_node_t*));
     ht->locks = malloc(INIT_SIZE * sizeof(pthread_mutex_t));
     if (!ht) return NULL;
-
-    for (int i = 0; i < ht->size; i++) {
+    int i;
+    for (i = 0; i < ht->size; i++) {
         ht->table[i] = NULL;
         pthread_mutex_init(&ht->locks[i], NULL);
     }
@@ -86,7 +86,8 @@ value_t r_lock_table_find(r_lock_hashtable_t* ht, my_key_t key) {
 
 // Function to free the hashtable
 void r_lock_table_free(r_lock_hashtable_t* ht) {
-    for (int i = 0; i < LOCK_TABLE_SIZE; i++) {
+    int i;
+    for (i = 0; i < LOCK_TABLE_SIZE; i++) {
         pthread_mutex_lock(&ht->locks[i]);
         r_lock_node_t* temp = ht->table[i];
         while (temp) {
@@ -132,9 +133,10 @@ int r_lock_table_delete(r_lock_hashtable_t* ht, my_key_t key)
 int r_lock_table_resize(r_lock_hashtable_t* ht) {
     int old_size = ht->size;
     int new_size = 2 * old_size;
+    int i;
 
     // Lock the whole table
-    for (int i = 0; i < old_size; i++) {
+    for (i = 0; i < old_size; i++) {
         pthread_mutex_lock(&ht->locks[i]);
     }
 
@@ -143,12 +145,12 @@ int r_lock_table_resize(r_lock_hashtable_t* ht) {
     pthread_mutex_t* new_locks = malloc(new_size * sizeof(pthread_mutex_t));
 
     // Initialize new locks
-    for (int i = 0; i < new_size; i++) {
+    for (i = 0; i < new_size; i++) {
         pthread_mutex_init(&new_locks[i], NULL);
     }
 
     // Rehash the elements
-    for (int i = 0; i < old_size; i++) {
+    for (i = 0; i < old_size; i++) {
         r_lock_node_t* current = ht->table[i];
         while (current != NULL) {
             int index = current->key % new_size;
@@ -172,7 +174,7 @@ int r_lock_table_resize(r_lock_hashtable_t* ht) {
     ht->size = new_size;
 
     // Unlock the whole table
-    for (int i = 0; i < new_size; i++) {
+    for (i = 0; i < new_size; i++) {
         pthread_mutex_unlock(&new_locks[i]);
     }
     return 1;

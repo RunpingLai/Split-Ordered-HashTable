@@ -17,8 +17,8 @@ unsigned int hash(my_key_t key) {
 lock_hashtable_t* lock_table_create() {
     lock_hashtable_t* ht = malloc(sizeof(lock_hashtable_t));
     if (!ht) return NULL;
-
-    for (int i = 0; i < LOCK_TABLE_SIZE; i++) {
+    int i;
+    for (i = 0; i < LOCK_TABLE_SIZE; i++) {
         ht->table[i] = NULL;
         pthread_mutex_init(&ht->locks[i], NULL);
     }
@@ -76,7 +76,8 @@ value_t lock_table_find(lock_hashtable_t* ht, my_key_t key) {
 
 // Function to free the hashtable
 void lock_table_free(lock_hashtable_t* ht) {
-    for (int i = 0; i < LOCK_TABLE_SIZE; i++) {
+    int i;
+    for (i = 0; i < LOCK_TABLE_SIZE; i++) {
         pthread_mutex_lock(&ht->locks[i]);
         lock_node_t* temp = ht->table[i];
         while (temp) {
