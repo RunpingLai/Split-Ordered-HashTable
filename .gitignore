@@ -1,3 +1,15 @@
 *.o
 *.swp
+.vscode/
+
+# Executables
 main
+draft
+test
+
+draft.c
+draft.py
+
+
+
+

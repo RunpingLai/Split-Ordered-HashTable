@@ -7,7 +7,11 @@
 #include "data_structures.h"
 
 
-// #define LOCK_TABLE_SIZE 20000
+
+// Simple hash function
+unsigned int hash(key_t key) {
+    return key % LOCK_TABLE_SIZE;
+}
 
 // Function to initialize the hashtable
 lock_hashtable_t* lock_table_create() {
@@ -20,11 +24,6 @@ lock_hashtable_t* lock_table_create() {
     }
 
     return ht;
-}
-
-// Simple hash function
-unsigned int hash(key_t key) {
-    return key % LOCK_TABLE_SIZE;
 }
 
 // Insert function
@@ -92,26 +91,6 @@ void lock_table_free(lock_hashtable_t* ht) {
 }
 
 // TODO: Add value as parameter
-// int lock_table_delete(lock_hashtable_t* ht, key_t key)
-// {
-//     int index = key % LOCK_TABLE_SIZE;
-
-//     pthread_mutex_lock(&ht->locks[index]);
-
-//     lock_node_t* curr = ht->table[index];
-//     lock_node_t* prev = NULL;
-//     while (curr != NULL) {
-//         if (curr->key == key) {
-//             prev->next = curr->next;
-//             free(curr);
-//             pthread_mutex_unlock(&ht->locks[index]);
-//             return 1;
-//         }
-//         prev = curr;
-//         curr = curr->next;
-//     }
-//     return 0;
-// }
 int lock_table_delete(lock_hashtable_t* ht, key_t key)
 {
     int index = key % LOCK_TABLE_SIZE;
@@ -135,6 +114,7 @@ int lock_table_delete(lock_hashtable_t* ht, key_t key)
         prev = curr;
         curr = curr->next;
     }
+    pthread_mutex_unlock(&ht->locks[index]);
     return 0;
 }
 

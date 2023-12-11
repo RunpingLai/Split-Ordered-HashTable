@@ -2,34 +2,49 @@
 #include <stdio.h>
 #include <stdlib.h>     // rand, srand
 #include <stdbool.h>
+#include <string.h>
 
 #include "data_structures.h"
 #include "lock_based_hashtable.h"
 #include "so_list_hashtable.h"
+#include "resizable_lk_hashtable.h"
 
 // if 0 means testing lock-based hashtable
-#define TESTING_SO_HASHTABLE_FLAG 0
-#if TESTING_SO_HASHTABLE_FLAG == 1
+// 0 SO
+// 1 LK
+// 2 RSZ_LK
+#define TEST_FLAG 1
+#if TEST_FLAG == 0
 #define hashtable_t hashtable_t
 #define tbl_find    table_find
 #define tbl_delete  table_delete
 #define tbl_insert  table_insert
 #define tbl_create  table_create
 #define tbl_free    table_free
-#else
+#elif TEST_FLAG == 1
 #define hashtable_t lock_hashtable_t
 #define tbl_find    lock_table_find
 #define tbl_delete  lock_table_delete
 #define tbl_insert  lock_table_insert
 #define tbl_create  lock_table_create
 #define tbl_free    lock_table_free
+#else
+#define hashtable_t r_lock_hashtable_t
+#define tbl_find    r_lock_table_find
+#define tbl_delete  r_lock_table_delete
+#define tbl_insert  r_lock_table_insert
+#define tbl_create  r_lock_table_create
+#define tbl_free    r_lock_table_free
 #endif
 
+hashtable_t*        tbl;
+// lock_hashtable_t*   tbl;
 
-// #define LOWER 50000
-// #define UPPER 20000000
-#define LOWER 500
-#define UPPER 20000
+
+#define LOWER 50000
+#define UPPER 20000000
+// #define LOWER 500
+// #define UPPER 20000
 #define THREADS 32
 // OPS_COUNT is a multiple of 2 since the thread counts are a factor of 2
 #define OPS_COUNT 16777216
@@ -51,8 +66,6 @@ static uint64_t random_delete_key() {
     return rand() % LOWER;
 }
 
-hashtable_t*        tbl;
-// lock_hashtable_t*   tbl;
 
 static void *test_case_1(void *arg) {
     // 50% inserts, 0% finds, 50% deletes
@@ -64,6 +77,7 @@ static void *test_case_1(void *arg) {
     value_t val;
 
     for (int i = 0; i < iterations; i++) {
+        // printf("iteration:%d\n", i);
         key_i = random_insert_key();
         temp_val = key_i >> 1;
         val = (void*)&temp_val;
@@ -220,7 +234,7 @@ int main()
         printf("-------------------Test Case %d Start-------------------\n", test_case_num);
         // 1 2 4 8 16 32
         for (int thread_num=1; thread_num<=THREADS; thread_num*=2) {
-            tbl = table_create();
+            tbl = tbl_create();
             int each_thread_ops_count = OPS_COUNT / thread_num;
 
             struct timespec start = timer_start();
@@ -234,7 +248,7 @@ int main()
             printf("%f, ", benchmark_time);
             printf("threads: %d, time: %f\n", thread_num, benchmark_time);
 
-            table_free(tbl);
+            tbl_free(tbl);
         }
         printf("-------------------Test Case %d Ended-------------------\n", test_case_num);
     }
