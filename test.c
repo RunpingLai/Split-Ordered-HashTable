@@ -13,7 +13,7 @@
 // 0 SO
 // 1 LK
 // 2 RSZ_LK
-#define TEST_FLAG 1
+#define TEST_FLAG 2
 #if TEST_FLAG == 0
 #define hashtable_t hashtable_t
 #define tbl_find    table_find
